@@ -12,9 +12,9 @@ sys.path.append(utils_path)
 from helper import load_cfg
 from minio_utils import MinIOClient
 
-cfg_file = "../Config/datalake.yaml"
+cfg_file = "/opt/airflow/Config/datalake.yaml"
 taxi_lookup_path = os.path.join(os.path.dirname(__file__),"Data","taxi_lookup.csv")
-years = ["2022"]
+years = ["2024"]
 
 def drop_column(df:pd.DataFrame, file):
     if "store_and_fwd_flag" in df.columns:
@@ -97,9 +97,9 @@ def transform_data(endpoint_url, access_key, secret_key):
     client.create_bucket(datalake_cfg['bucket_name_2'])
 
     for year in years:
-        data_files_local = glob(os.path.join("..",nyc_data_cfg["folder_path"],year,"*.parquet"))
+        data_files_local = glob(os.path.join("/opt/airflow",nyc_data_cfg["folder_path"],year,"*.parquet"))
         for file in data_files_local:
-            file_name = file.split("\\")[-1]
+            file_name = file.split("/")[-1]
             print(f"Reading parquet file {file_name}")
             df = pd.read_parquet(file,engine="pyarrow")
             df.columns = map(str.lower,df.columns)

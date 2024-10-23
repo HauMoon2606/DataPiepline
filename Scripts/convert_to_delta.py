@@ -16,7 +16,7 @@ from minio_utils import MinIOClient
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(levelname)s:%(message)s')
 warnings.filterwarnings('ignore')
 
-cfg = load_cfg("../Config/datalake.yaml")
+cfg = load_cfg("/opt/airflow/Config/datalake.yaml")
 datalake_cfg = cfg["datalake"] 
 
 MINIO_ENDPOINT = datalake_cfg["endpoint"]
@@ -66,7 +66,7 @@ def delta_convert(endpoint_url, access_key, secret_key):
         df_delta = df.write \
                     .format("delta") \
                     .mode("overwrite") \
-                    .save(f"s3a://{bucket_name_3}/{datalake_cfg["folder_name"]}")
+                    .save(f"s3a://{bucket_name_3}/{datalake_cfg['folder_name']}")
         logging.info("="*50 +"Complete" +"="*50)
 
 if __name__ == "__main__":

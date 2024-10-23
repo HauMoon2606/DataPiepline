@@ -73,15 +73,14 @@ x-airflow-common:
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/Airflow/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/Airflow/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/Airflow/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/Airflow/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/Airflow/include:/opt/airflow/include
-    - ./Airflow/data:/opt/airflow/data
-    - ./Airflow/dags/scripts:/opt/airflow/dags/scripts
-    - ./Airflow/dags/utils:/opt/airflow/dags/utils
-    - .Airflow/dags/scripts/jars:/opt/airflow/dags/scripts/jars
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ./Config:/opt/airflow/Config
+    - ./Data:/opt/airflow/Data
+    - ./Scripts:/opt/airflow/dags/Scripts
+    - ./utils:/opt/airflow/dags/utils
+    - ./Scripts/jars:/opt/airflow/dags/Scripts/jars
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - //var/run/docker.sock:/var/run/docker.sock
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -106,7 +105,7 @@ services:
       interval: 10s
       retries: 5
       start_period: 5s
-    restart: always
+    # restart: always
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -121,7 +120,7 @@ services:
       timeout: 30s
       retries: 50
       start_period: 30s
-    restart: always
+    # restart: always
 
   airflow-webserver:
     <<: *airflow-common
