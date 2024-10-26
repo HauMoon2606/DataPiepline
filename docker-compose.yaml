@@ -13,5 +13,39 @@ services:
       MINIO_ACCESS_KEY: minio_access_key
       MINIO_SECRET_KEY: minio_secret_key
     command: server --console-address ":9001" /data
+
+  postgresql:
+    image: postgres:latest
+    container_name: dw-postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER : admin
+      POSTGRES_PASSWORD : admin
+    volumes:
+      - ./dw_postgres_data:/var/lib/postgresql/data 
+    networks:
+      - postgres_pgadmin
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - ./pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres_pgadmin
+
+networks:
+  postgres_pgadmin:
+
 volumes:
   minio_storage:
+  dw_postgres_data:
+  pgadmin:
