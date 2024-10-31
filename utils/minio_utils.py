@@ -25,11 +25,19 @@ class MinIOClient:
         else:
             print(f"Bucket {bucket_namne} already exists")
 
+    # not use
     def list_parquet_files(self, bucket_name, prefix=""):
         client = self.create_conn()
         objects = client.list_objects(bucket_name,prefix,recursive=True)
         parquet_files = [obj.object_name for obj in objects if obj.object_name.endswith('.parquet')]
         return parquet_files
+    # list parquet files follow by year,month
+    def list_follow_by_year_month(self, bucket_name, year,month,prefix=""):
+        pattern = f"{year}-{month}.parquet"
+        client = self.create_conn()
+        objects = client.list_objects(bucket_name,prefix,recursive=True)
+        file_with_year_month = [obj.object_name for obj in objects if pattern in obj.object_name]
+        return file_with_year_month
 
 
 

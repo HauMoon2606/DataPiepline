@@ -11,10 +11,12 @@ sys.path.append(utils_path)
 
 from helper import load_cfg
 from minio_utils import MinIOClient
-
+#path in airflow docker
 cfg_file = "/opt/airflow/Config/datalake.yaml"
+
+#path in local
+# cfg_file = "../Config/datalake.yaml"
 taxi_lookup_path = os.path.join(os.path.dirname(__file__),"Data","taxi_lookup.csv")
-years = ["2024"]
 
 def drop_column(df:pd.DataFrame, file):
     if "store_and_fwd_flag" in df.columns:
@@ -84,7 +86,7 @@ def process(df:pd.DataFrame, file:str):
     print("Transformed data from file: "+file)
     return df
 
-def transform_data(endpoint_url, access_key, secret_key):
+def transform_data(endpoint_url, access_key, secret_key,year,month):
     cfg = load_cfg(cfg_file)
     datalake_cfg = cfg["datalake"]
     nyc_data_cfg = cfg["nyc_data"]
@@ -96,31 +98,31 @@ def transform_data(endpoint_url, access_key, secret_key):
     )
     client.create_bucket(datalake_cfg['bucket_name_2'])
 
-    for year in years:
-        data_files_local = glob(os.path.join("/opt/airflow",nyc_data_cfg["folder_path"],year,"*.parquet"))
-        for file in data_files_local:
-            file_name = file.split("/")[-1]
-            print(f"Reading parquet file {file_name}")
-            df = pd.read_parquet(file,engine="pyarrow")
-            df.columns = map(str.lower,df.columns)
+    data_files_local = glob(os.path.join("/opt/airflow",nyc_data_cfg["folder_path"],year,f"*_{year}-{month}.parquet"))
+    for file in data_files_local:
+        print(file)
+        file_name = file.split("/")[-1]
+        print(f"Reading parquet file {file_name}")
+        df = pd.read_parquet(file,engine="pyarrow")
+        df.columns = map(str.lower,df.columns)
 
-            df = drop_column(df, file_name)
-            df = merge_taxi_zone(df,file_name)
-            df = process(df, file_name)
+        df = drop_column(df, file_name)
+        df = merge_taxi_zone(df,file_name)
+        df = process(df, file_name)
 
-            path_in_s3 = f"s3://{datalake_cfg['bucket_name_2']}/{datalake_cfg['folder_name']}/" + file_name
+        path_in_s3 = f"s3://{datalake_cfg['bucket_name_2']}/{datalake_cfg['folder_name']}/" + file_name
 
-            storage_options = {
-                'key': access_key,
-                'secret': secret_key,
-                'client_kwargs': {
-                    'endpoint_url': f"http://{endpoint_url}"
-                }
+        storage_options = {
+            'key': access_key,
+            'secret': secret_key,
+            'client_kwargs': {
+                'endpoint_url': f"http://{endpoint_url}"
             }
+        }
 
-            df.to_parquet(path_in_s3,index=False,storage_options=storage_options, engine="pyarrow" )
-            print("Finished transforming data in file: "+path_in_s3)
-            print("="*100)
+        df.to_parquet(path_in_s3,index=False,storage_options=storage_options, engine="pyarrow" )
+        print("Finished transforming data in file: "+path_in_s3)
+        print("="*100)
 
 if __name__ == "__main__":
     cfg = load_cfg(cfg_file)
@@ -129,8 +131,7 @@ if __name__ == "__main__":
     endpoint_url_local = datalake_cfg["endpoint"]
     access_key_local = datalake_cfg["access_key"]
     secret_key_local = datalake_cfg["secret_key"]
-
-    transform_data(endpoint_url_local,access_key_local,secret_key_local)
+    transform_data(endpoint_url_local,access_key_local,secret_key_local,"2023","01")
 
 
 

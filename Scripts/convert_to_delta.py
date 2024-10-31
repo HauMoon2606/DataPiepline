@@ -25,7 +25,7 @@ MINIO_SCRET_KEY = datalake_cfg["secret_key"]
 bucket_name_2 = datalake_cfg["bucket_name_2"]
 bucket_name_3 = datalake_cfg["bucket_name_3"]
 
-def delta_convert(endpoint_url, access_key, secret_key):
+def delta_convert(endpoint_url, access_key, secret_key, year, month):
     from pyspark.sql import SparkSession
     from delta.pip_utils import configure_spark_with_delta_pip
 
@@ -54,10 +54,9 @@ def delta_convert(endpoint_url, access_key, secret_key):
         secret_key = secret_key
     )
     client.create_bucket(bucket_name_3)
-    for file in client.list_parquet_files(bucket_name_2, prefix = datalake_cfg["folder_name"]):
+    for file in client.list_follow_by_year_month(bucket_name_2,year,month, prefix = datalake_cfg["folder_name"]):
         path_read = f"s3a://{bucket_name_2}/" +file
         logging.info(f"Reading parquet file: {file}")
-
         df = spark.read.parquet(path_read)
 
         path_read = f"s3a://{bucket_name_3}/" +file
@@ -70,7 +69,7 @@ def delta_convert(endpoint_url, access_key, secret_key):
         logging.info("="*50 +"Complete" +"="*50)
 
 if __name__ == "__main__":
-    delta_convert(MINIO_ENDPOINT,MINIO_ACCESS_KEY,MINIO_SCRET_KEY)
+    delta_convert(MINIO_ENDPOINT,MINIO_ACCESS_KEY,MINIO_SCRET_KEY,"2023","02")
 
 
 

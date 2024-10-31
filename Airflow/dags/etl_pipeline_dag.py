@@ -31,8 +31,8 @@ path_data = os.path.abspath(os.path.join(os.path.dirname(__file__),"../../Data/"
 
 with DAG(
     "etl_pipeline",
-    start_date=datetime(2024,1,1),
-    end_date=datetime(2024,6,1),
+    start_date=datetime(2023,1,1),
+    end_date=datetime(2023,12,1),
     schedule_interval="@monthly",
     default_args=default_args) as dag:
 
@@ -62,7 +62,9 @@ with DAG(
         op_kwargs={
             "endpoint_url":MINIO_ENDPOINT,
             "access_key":MINIO_ACCESSKEY,
-            "secret_key": MINIO_SECRET_KEY
+            "secret_key": MINIO_SECRET_KEY,
+            "year":"{{execution_date.year}}",
+            "month":"{{execution_date.strftime('%m')}}"
         }
     )
 
@@ -72,7 +74,9 @@ with DAG(
         op_kwargs={
             'endpoint_url':MINIO_ENDPOINT,
             "access_key":MINIO_ACCESSKEY,
-            "secret_key":MINIO_SECRET_KEY
+            "secret_key":MINIO_SECRET_KEY,
+            "year":"{{execution_date.year}}",
+            "month":"{{execution_date.strftime('%m')}}"
         }
     )
     
@@ -82,7 +86,9 @@ with DAG(
         op_kwargs={
             "endpoint_url":MINIO_ENDPOINT,
             "access_key":MINIO_ACCESSKEY,
-            "secret_key":MINIO_SECRET_KEY
+            "secret_key":MINIO_SECRET_KEY,
+            "year":"{{execution_date.year}}",
+            "month":"{{execution_date.strftime('%m')}}"
         }
     )
 

@@ -1,3 +1,5 @@
 /Scripts/jars/*
 **/__pycache__/
 /Data/
+/dw_postgres_data/
+/pgadmin/
