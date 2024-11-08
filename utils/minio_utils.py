@@ -25,7 +25,7 @@ class MinIOClient:
         else:
             print(f"Bucket {bucket_namne} already exists")
 
-    # not use
+    # list parquet file in bucket
     def list_parquet_files(self, bucket_name, prefix=""):
         client = self.create_conn()
         objects = client.list_objects(bucket_name,prefix,recursive=True)
