@@ -23,7 +23,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     volumes:
-      - ./dw_postgres_data:/var/lib/postgresql/data 
+      - dw_postgres_data:/var/lib/postgresql/data 
     networks:
       - postgres_pgadmin
 
