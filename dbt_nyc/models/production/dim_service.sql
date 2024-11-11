@@ -1,4 +1,4 @@
-{{config(materialized = 'table', schema = 'production')}}
+{{config(materialized = 'table')}}
 with service_type_tmp as (
     select distinct 
         service_type

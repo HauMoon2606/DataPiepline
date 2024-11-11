@@ -1,4 +1,4 @@
-{{ config(materialized = 'table', schema = 'production')}}
+{{ config(materialized = 'table')}}
 with vendor_tmp as(
     select distinct 
         vendor_id

@@ -1,4 +1,4 @@
-{{config(materialized = 'table', schema = 'production')}}
+{{config(materialized = 'table')}}
 with pickup_location_tmp as(
     select distinct 
         pickup_location_id,

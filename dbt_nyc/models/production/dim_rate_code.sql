@@ -1,4 +1,4 @@
-{{config(meterialized = 'table', schema = 'production')}}
+{{config(meterialized = 'table')}}
 with rate_code_tmp as(
     select distinct 
         rate_code_id

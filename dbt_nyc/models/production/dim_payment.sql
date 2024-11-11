@@ -1,4 +1,4 @@
-{{config(materialized = 'table', schema = 'production')}}
+{{config(materialized = 'table')}}
 
 with payment_staing as (
     select distinct

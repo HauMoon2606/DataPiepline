@@ -1,4 +1,4 @@
-{{ config (materialized = 'table', schema = 'production')}}
+{{ config (materialized = 'table')}}
 with trip_tmp as (
     select 
         {{dbt_utils.generate_surrogate_key(['f.vendor_id','f.rate_code_id','f.pickup_location_id',
