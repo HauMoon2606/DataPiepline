@@ -72,7 +72,7 @@ models:
 
   - name: dim_service
     columns:
-      - name: service_name
+      - name: service_description
         data_tests:
           - not_null
 

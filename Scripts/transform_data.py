@@ -11,19 +11,24 @@ sys.path.append(utils_path)
 
 from helper import load_cfg
 from minio_utils import MinIOClient
-#path in airflow docker
-cfg_file = "/opt/airflow/Config/datalake.yaml"
+# #path in airflow docker
+# cfg_file = "/opt/airflow/Config/datalake.yaml"
 
 #path in local
-# cfg_file = "../Config/datalake.yaml"
+cfg_file = "../Config/datalake.yaml"
 taxi_lookup_path = os.path.join(os.path.dirname(__file__),"Data","taxi_lookup.csv")
 
-def drop_column(df:pd.DataFrame, file):
+def drop_column(df:pd.DataFrame, file: str):
     if "store_and_fwd_flag" in df.columns:
         df=df.drop(columns=["store_and_fwd_flag"])
         print(f"Dropped column store_and_fwd_flag from file {file}")
     else:
         print(f"Column store_and_fwd_flag not found in file {file}")
+
+    if file.startswith('green'):
+        df = df.drop(columns=["ehail_fee"])
+    if file.startswith('yellow'):
+        df = df.drop(columns=['airport_fee'])
     return df
 
 def merge_taxi_zone(df:pd.DataFrame, file):
@@ -52,8 +57,7 @@ def process(df:pd.DataFrame, file:str):
         df.rename(
             columns={
                 "lpep_pickup_datetime":"pickup_datetime",
-                "lpep_dropoff_datetime":"dropoff_datetime",
-                "ehail_fee":"fee"
+                "lpep_dropoff_datetime":"dropoff_datetime"
             },
             inplace= True
         )
@@ -64,21 +68,12 @@ def process(df:pd.DataFrame, file:str):
             columns={
                 "tpep_pickup_datetime":"pickup_datetime",
                 "tpep_dropoff_datetime":"dropoff_datetime",
-                "airport_fee": "fee"
             },
             inplace=True
         )
     if "payment_type" in df.columns:
         df["payment_type"] = df["payment_type"].astype(int)
-    if "dolocationid" in df.columns:
-        df["dolocationid"] = df["dolocationid"].astype(int)
-    if "pulocationid" in df.columns:
-        df["pulocationid"] = df["pulocationid"].astype(int)
-    if "vendorid" in df.columns:
-        df["vendorid"] = df["vendorid"].astype(int)
-
-    if "fee" in df.columns:
-        df.drop(columns=["fee"], inplace=True)
+    
 
     df = df.dropna()
     df = df.reindex(sorted(df.columns),axis=1)
@@ -97,11 +92,13 @@ def transform_data(endpoint_url, access_key, secret_key,year,month):
         secret_key=secret_key
     )
     client.create_bucket(datalake_cfg['bucket_name_2'])
+    # run in airflow
+    # data_files_local = glob(os.path.join("/opt/airflow",nyc_data_cfg["folder_path"],year,f"*_{year}-{month}.parquet"))
 
-    data_files_local = glob(os.path.join("/opt/airflow",nyc_data_cfg["folder_path"],year,f"*_{year}-{month}.parquet"))
+    #run in local
+    data_files_local = glob(os.path.join("..",nyc_data_cfg['folder_path'],str(year),f"*_{year}-{month}.parquet"))
     for file in data_files_local:
-        print(file)
-        file_name = file.split("/")[-1]
+        file_name = file.split('\\')[-1]
         print(f"Reading parquet file {file_name}")
         df = pd.read_parquet(file,engine="pyarrow")
         df.columns = map(str.lower,df.columns)

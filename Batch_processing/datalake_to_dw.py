@@ -73,7 +73,8 @@ def processing_dataframe(df, file_name):
     df_tmp = df.withColumn('year',F.year('pickup_datetime'))\
                 .withColumn('month',F.date_format('pickup_datetime','MMMM'))\
                 .withColumn('dow',F.date_format('pickup_datetime','EEEE'))
-    df_res = df_tmp.groupBy(
+    df_res = df_tmp.drop('pickup_datetime','dropoff_datetime')
+    df_res = df_res.groupBy(
         'year',
         'month',
         'dow',
@@ -82,8 +83,6 @@ def processing_dataframe(df, file_name):
         F.col('pulocationid').alias('pickup_location_id'),
         F.col('dolocationid').alias('dropoff_location_id'),
         F.col('payment_type').alias('payment_type_id'),
-        'pickup_datetime',
-        'dropoff_datetime',
         'pickup_latitude',
         'pickup_longitude',
         'dropoff_latitude',
@@ -135,7 +134,8 @@ if __name__ == "__main__":
 
         df_final = processing_dataframe(df,file)
         load_to_staging_table(df_final)
-        print("="*5)
+    
+    print("="*10)
 
     logging.info(f"Time to process: {time.time() - start_time}")
     logging.info("Batch processing successfully!")
