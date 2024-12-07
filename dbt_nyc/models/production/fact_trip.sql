@@ -2,16 +2,16 @@
 with trip_tmp as (
     select 
         {{dbt_utils.generate_surrogate_key(['f.vendor_id','f.rate_code_id','f.pickup_location_id',
-        'f.dropoff_location_id','f.payment_type_id','f.service_type','f.pickup_datetime','f.dropoff_datetime'])}} as trip_key,
+        'f.dropoff_location_id','f.payment_type_id','f.service_type','f.year','f.month','f.dow'])}} as trip_key,
         dv.vendor_key,
         dr.rate_code_key,
         dp.payment_type_key,
+        ds.service_type_key,
         f.pickup_location_id,
         f.dropoff_location_id,
-        f.service_type as service_type_id,
-        -- timestamp
-        f.pickup_datetime,
-        f.dropoff_datetime,
+        f.year,
+        f.month,
+        f.dow,
         --trip info
         f.passenger_count,
         f.trip_distance,
