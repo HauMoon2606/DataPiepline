@@ -4,6 +4,8 @@ This is a project DE that uses a data set of taxi trips in New York City. In whi
 
 ##  System of architecture
 ![pipeline](/Image/NYC_taxi_data_pipeline.png)
+## Star Schema
+![StarSchema](/Image/StarSchema.png)
 ## Dashboard
 ![Dashboard](/Image/Dashboard.png)
 
